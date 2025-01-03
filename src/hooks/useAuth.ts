@@ -20,21 +20,17 @@ export function useAuth() {
         throw new Error('Login failed');
       }
 
+      setUser(profile);
+
       // For agents, check subscription status
-      if (profile?.role === 'agent') {
-        if (!profile.subscription_status || profile.subscription_status === 'inactive') {
-          throw new Error('Your subscription is inactive. Please update your payment information.');
+      if (profile.role === 'agent') {
+        if (!profile.subscriptionStatus || profile.subscriptionStatus === 'inactive') {
+          navigate('/subscription');
+          return;
         }
       }
 
-      setUser({
-        id: session.user.id,
-        email: session.user.email!,
-        name: profile.name,
-        role: profile.role,
-        subscriptionStatus: profile.subscription_status
-      });
-
+      // Navigate to appropriate dashboard
       navigate(profile.role === 'agent' ? '/agent' : '/client');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
